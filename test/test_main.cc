@@ -4,7 +4,7 @@
 
 using namespace drogon;
 
-DROGON_TEST(RemoteAPITest)
+DROGON_TEST(NothingAPITest)
 {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
     auto req = HttpRequest::newHttpRequest();
@@ -21,10 +21,25 @@ DROGON_TEST(RemoteAPITest)
 
 }
 
-DROGON_TEST(BasicTest)
+DROGON_TEST(CreateGameAPITest)
 {
-    // Add your tests here
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
+    auto req = HttpRequest::newHttpRequest();
+    req->setPath("/guess_number_game:start");
+    req->setMethod(HttpMethod::Post);
+    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr& resp) {
+        // There's nothing we can do if the request didn't reach the server
+        // or the server generated garbage.
+        REQUIRE(res == ReqResult::Ok);
+        REQUIRE(resp != nullptr);
+
+        CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
+        CHECK(resp->contentType() == CT_APPLICATION_JSON);
+    });
+
 }
+
+
 
 int main(int argc, char** argv) 
 {
