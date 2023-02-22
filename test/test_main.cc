@@ -2,6 +2,25 @@
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
 
+using namespace drogon;
+
+DROGON_TEST(RemoteAPITest)
+{
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
+    auto req = HttpRequest::newHttpRequest();
+    req->setPath("/");
+    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr& resp) {
+        // There's nothing we can do if the request didn't reach the server
+        // or the server generated garbage.
+        REQUIRE(res == ReqResult::Ok);
+        REQUIRE(resp != nullptr);
+
+        CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
+        CHECK(resp->contentType() == CT_APPLICATION_JSON);
+    });
+
+}
+
 DROGON_TEST(BasicTest)
 {
     // Add your tests here
@@ -18,6 +37,7 @@ int main(int argc, char** argv)
     std::thread thr([&]() {
         // Queues the promise to be fulfilled after starting the loop
         app().getLoop()->queueInLoop([&p1]() { p1.set_value(); });
+        app().addListener("127.0.0.1", 8848);
         app().run();
     });
 
