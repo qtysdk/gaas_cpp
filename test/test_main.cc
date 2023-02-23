@@ -3,6 +3,7 @@
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
 #include <nlohmann/json.hpp>
+#include "../GameRepository.h"
 
 using namespace drogon;
 using json = nlohmann::json;
@@ -42,8 +43,10 @@ DROGON_TEST(CreateGameAPITest) {
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
         auto result = json::parse(resp->getBody());
-        CHECK("5566" == result["game_id"]);
+        auto game = gameRepository.findGameById(result["game_id"]);
+
         CHECK("I have no name" == result["player_name"]);
+        CHECK("I have no name" == game.playerName);
     });
 
 }
