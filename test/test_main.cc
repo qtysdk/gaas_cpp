@@ -1,48 +1,45 @@
 #define DROGON_TEST_MAIN
+
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
 
 using namespace drogon;
 
-DROGON_TEST(NothingAPITest)
-{
+DROGON_TEST(NothingAPITest) {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
     auto req = HttpRequest::newHttpRequest();
     req->setPath("/");
-    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr& resp) {
-        // There's nothing we can do if the request didn't reach the server
-        // or the server generated garbage.
+    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
         REQUIRE(res == ReqResult::Ok);
         REQUIRE(resp != nullptr);
 
         CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
+
+        // TODO check the response in that format
+        // {"game_id": "", "player_name": "", "history": ""}
     });
 
 }
 
-DROGON_TEST(CreateGameAPITest)
-{
+DROGON_TEST(CreateGameAPITest) {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
     auto req = HttpRequest::newHttpRequest();
     req->setPath("/guess_number_game:start");
     req->setMethod(HttpMethod::Post);
-    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr& resp) {
-        // There's nothing we can do if the request didn't reach the server
-        // or the server generated garbage.
+    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
         REQUIRE(res == ReqResult::Ok);
         REQUIRE(resp != nullptr);
 
         CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
+
     });
 
 }
 
 
-
-int main(int argc, char** argv) 
-{
+int main(int argc, char **argv) {
     using namespace drogon;
 
     std::promise<void> p1;
