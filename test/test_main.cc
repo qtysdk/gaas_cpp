@@ -25,6 +25,38 @@ DROGON_TEST(NothingAPITest) {
 
 }
 
+
+DROGON_TEST(GAME_RespondTest) {
+
+    CHECK("4A0B" == createRespond(2345, 2345));
+    CHECK("2A2B" == createRespond(1234, 2134));
+    CHECK("0A1B" == createRespond(1234, 4567));
+    CHECK("0A0B" == createRespond(1234, 5678));
+}
+
+DROGON_TEST(GAME_NumberValidatorTest) {
+
+    CHECK(false == validateNumber(1));
+    CHECK(false == validateNumber(12456));
+
+    CHECK(false == validateNumber(5666));
+    CHECK(false == validateNumber(5566));
+    CHECK(false == validateNumber(5556));
+    CHECK(false == validateNumber(5555));
+
+    CHECK(true == validateNumber(1234));
+    CHECK(true == validateNumber(9527));
+
+}
+
+DROGON_TEST(GAME_AnswerGeneratorTest) {
+
+    for (int i = 0; i < 100; ++i) {
+        CHECK(validateNumber(createAnswer()));
+    }
+
+}
+
 DROGON_TEST(GameAPITest) {
 
     std::mutex mtx;
@@ -89,7 +121,8 @@ DROGON_TEST(GameAPITest) {
             auto game = gameRepository.findGameById(result["game_id"]);
             CHECK(result["history"].size() == 1);
 
-            auto expected = json{{"guess", 1234}, {"respond", "4A0B"}};
+            auto expected = json{{"guess",   1234},
+                                 {"respond", "4A0B"}};
             CHECK(expected == result["history"][0]);
         });
     }

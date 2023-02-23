@@ -23,3 +23,10 @@ public:
 
     bool guessNumber(int number);
 };
+
+
+int createAnswer();
+
+bool validateNumber(int number);
+
+std::string createRespond(int answer, int number);

@@ -23,3 +23,15 @@ bool Game::guessNumber(int number) {
     }
     return false;
 }
+
+int createAnswer() {
+    return 0;
+}
+
+bool validateNumber(int number) {
+    return false;
+}
+
+std::string createRespond(int answer, int number) {
+    return std::string();
+}
