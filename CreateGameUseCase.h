@@ -2,6 +2,7 @@
 
 #include <string>
 #include <list>
+#include "Models.h"
 
 using namespace std;
 
@@ -17,11 +18,7 @@ class Output {
 
 
 public:
-    string gameId;
-    string playerName;
-
-//    TODO define the history entry
-//    list<Record> history;
+    Game game;
 
     string to_json();
 };

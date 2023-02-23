@@ -47,6 +47,7 @@ DROGON_TEST(CreateGameAPITest) {
 
         CHECK("I have no name" == result["player_name"]);
         CHECK("I have no name" == game.playerName);
+        CHECK(result["history"].empty());
     });
 
 }

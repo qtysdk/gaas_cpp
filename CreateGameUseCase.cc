@@ -12,14 +12,21 @@ Input::Input(string playerName) {
 void CreateGameUseCase::execute(Input input, Output &output) {
     // 用 repo 查改存推
     auto game = gameRepository.create(input.playerName);
-    
-    output.gameId = game.id;
-    output.playerName = game.playerName;
+    output.game = game;
 }
 
+
 string Output::to_json() {
-    // TODO add real history
-    return json{{"game_id",     this->gameId},
-                {"player_name", this->playerName},
+    json history = json::array();
+    for (const auto &record: this->game.history) {
+        json entry;
+        entry["guess"] = record->guess;
+        entry["respond"] = record->respond;
+        history.push_back(entry);
+    }
+
+    return json{{"game_id",     this->game.id},
+                {"player_name", this->game.playerName},
+                {"history",     history}
     }.dump();
 }
