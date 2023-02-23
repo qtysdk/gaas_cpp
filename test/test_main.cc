@@ -28,6 +28,7 @@ DROGON_TEST(NothingAPITest) {
 
 DROGON_TEST(GAME_RespondTest) {
 
+    CHECK("0A0B" == createRespond(2345, 234577));
     CHECK("4A0B" == createRespond(2345, 2345));
     CHECK("2A2B" == createRespond(1234, 2134));
     CHECK("0A1B" == createRespond(1234, 4567));

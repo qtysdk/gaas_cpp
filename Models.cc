@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <random>
+#include <sstream>
 #include "Models.h"
 
 Game::~Game() {
@@ -59,5 +60,30 @@ bool validateNumber(int number) {
 }
 
 std::string createRespond(int answer, int number) {
-    return std::string();
+    auto valid = validateNumber(answer) && validateNumber(number);
+    if (!valid) {
+        return "0A0B";
+    }
+
+    std::string m = std::to_string(answer);
+    std::string n = std::to_string(number);
+
+    int a = 0;
+    int b = 0;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (m[i] == n[j]) {
+                if (i == j) {
+                    a++;
+                } else {
+                    b++;
+                }
+            }
+        }
+    }
+
+    std::stringstream output;
+    output << a << "A" << b << "B";
+
+    return output.str();
 }
