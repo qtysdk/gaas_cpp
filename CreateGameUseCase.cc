@@ -1,5 +1,6 @@
 #include "CreateGameUseCase.h"
 #include <nlohmann/json.hpp>
+#include "GameRepository.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -9,8 +10,11 @@ Input::Input(string playerName) {
 }
 
 void CreateGameUseCase::execute(Input input, Output &output) {
-    output.gameId = "5566";
-    output.playerName = input.playerName;
+    // 用 repo 查改存推
+    auto game = gameRepository.create(input.playerName);
+    
+    output.gameId = game.id;
+    output.playerName = game.playerName;
 }
 
 string Output::to_json() {
