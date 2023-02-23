@@ -13,16 +13,14 @@ Game::~Game() {
 }
 
 Game::Game() {
-    this->answer = 1234;
+    this->answer = createAnswer();
 }
 
 bool Game::guessNumber(int number) {
-    if (number == this->answer) {
-        Record *r = new Record;
-        r->guess = number;
-        r->respond = "4A0B";
-        history.push_back(r);
-    }
+    Record *r = new Record;
+    r->guess = number;
+    r->respond = createRespond(this->answer, number);
+    history.push_back(r);
     return false;
 }
 

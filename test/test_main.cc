@@ -111,6 +111,12 @@ DROGON_TEST(GameAPITest) {
                                     {"number",  1234}};
 
         req->setBody(guessNumberData.dump());
+
+        // arrange the final answer
+        Game *game = gameRepository.findGameById(gameId);
+        game->answer = 1234;
+
+
         client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
             REQUIRE(res == ReqResult::Ok);
             REQUIRE(resp != nullptr);
@@ -119,7 +125,6 @@ DROGON_TEST(GameAPITest) {
             CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
             auto result = json::parse(resp->getBody());
-            auto game = gameRepository.findGameById(result["game_id"]);
             CHECK(result["history"].size() == 1);
 
             auto expected = json{{"guess",   1234},
