@@ -1,15 +1,21 @@
 #include "CreateGameUseCase.h"
+#include <nlohmann/json.hpp>
 
 using namespace std;
+using json = nlohmann::json;
 
-Input::Input(string player_name) {
-    this->player_name = player_name;
+Input::Input(string playerName) {
+    this->playerName = playerName;
 }
 
-void CreateGameUseCase::execute(Input input, Output output) {
-
+void CreateGameUseCase::execute(Input input, Output &output) {
+    output.gameId = "5566";
+    output.playerName = input.playerName;
 }
 
 string Output::to_json() {
-    return "";
+    // TODO add real history
+    return json{{"game_id",     this->gameId},
+                {"player_name", this->playerName},
+    }.dump();
 }

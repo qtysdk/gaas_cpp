@@ -2,8 +2,10 @@
 
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
+#include <nlohmann/json.hpp>
 
 using namespace drogon;
+using json = nlohmann::json;
 
 DROGON_TEST(NothingAPITest) {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
@@ -17,7 +19,7 @@ DROGON_TEST(NothingAPITest) {
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
         // TODO check the response in that format
-        // {"game_id": "", "player_name": "", "history": ""}
+        // {"game_id": "", "playerName": "", "history": ""}
     });
 
 }
@@ -25,8 +27,13 @@ DROGON_TEST(NothingAPITest) {
 DROGON_TEST(CreateGameAPITest) {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
     auto req = HttpRequest::newHttpRequest();
+
     req->setPath("/guess_number_game:start");
     req->setMethod(HttpMethod::Post);
+
+    auto data = json{{"player_name", "I have no name"}};
+    req->setBody(data.dump());
+
     client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
         REQUIRE(res == ReqResult::Ok);
         REQUIRE(resp != nullptr);
@@ -34,6 +41,9 @@ DROGON_TEST(CreateGameAPITest) {
         CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
+        auto result = json::parse(resp->getBody());
+        CHECK("5566" == result["game_id"]);
+        CHECK("I have no name" == result["player_name"]);
     });
 
 }
