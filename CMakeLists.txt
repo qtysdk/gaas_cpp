@@ -21,6 +21,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} main.cc NothingCtrl.cc CreateGameCtrl.cc CreateGameUseCase.cc)
 
+
+# add dependencies
+include(cmake/CPM.cmake)
+CPMAddPackage("gh:nlohmann/json@3.10.5")
+
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
 # to add drogon 
@@ -29,7 +34,7 @@ add_executable(${PROJECT_NAME} main.cc NothingCtrl.cc CreateGameCtrl.cc CreateGa
 #
 # and comment out the following lines
 find_package(Drogon CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
+target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon nlohmann_json::nlohmann_json)
 
 # ##############################################################################
 
