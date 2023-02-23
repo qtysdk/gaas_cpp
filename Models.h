@@ -20,4 +20,6 @@ public:
     Game();
 
     ~Game();
+
+    bool guessNumber(int number);
 };

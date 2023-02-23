@@ -25,30 +25,74 @@ DROGON_TEST(NothingAPITest) {
 
 }
 
-DROGON_TEST(CreateGameAPITest) {
-    auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
-    auto req = HttpRequest::newHttpRequest();
+DROGON_TEST(GameAPITest) {
 
-    req->setPath("/guess_number_game:start");
-    req->setMethod(HttpMethod::Post);
+    std::mutex mtx;
+    std::condition_variable cv;
+    bool finished = false;
 
-    auto data = json{{"player_name", "I have no name"}};
-    req->setBody(data.dump());
+    std::string gameId = "";
+    {
+        auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
+        auto req = HttpRequest::newHttpRequest();
+        req->setMethod(HttpMethod::Post);
 
-    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
-        REQUIRE(res == ReqResult::Ok);
-        REQUIRE(resp != nullptr);
+        req->setPath("/guess_number_game:start");
+        auto createGameData = json{{"player_name", "I have no name"}};
+        req->setBody(createGameData.dump());
 
-        CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
-        CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
-        auto result = json::parse(resp->getBody());
-        auto game = gameRepository.findGameById(result["game_id"]);
+        client->sendRequest(req, [TEST_CTX, &gameId, &mtx, &finished, &cv](ReqResult res, const HttpResponsePtr &resp) {
+            REQUIRE(res == ReqResult::Ok);
+            REQUIRE(resp != nullptr);
 
-        CHECK("I have no name" == result["player_name"]);
-        CHECK("I have no name" == game.playerName);
-        CHECK(result["history"].empty());
-    });
+            CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
+            CHECK(resp->contentType() == CT_APPLICATION_JSON);
+
+            auto result = json::parse(resp->getBody());
+            auto game = gameRepository.findGameById(result["game_id"]);
+
+            CHECK("I have no name" == result["player_name"]);
+            CHECK("I have no name" == game->playerName);
+            CHECK(result["history"].empty());
+
+            std::unique_lock<std::mutex> lock(mtx);
+            finished = true;
+            cv.notify_all();
+            gameId = game->id;
+        });
+    }
+
+
+    // Wait for the callback to complete
+    std::unique_lock<std::mutex> lock(mtx);
+    cv.wait(lock, [&]() { return finished; });
+
+    {
+        auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
+        auto req = HttpRequest::newHttpRequest();
+        req->setMethod(HttpMethod::Post);
+
+        req->setPath("/guess_number_game:guess");
+        auto guessNumberData = json{{"game_id", gameId},
+                                    {"number",  1234}};
+
+        req->setBody(guessNumberData.dump());
+        client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
+            REQUIRE(res == ReqResult::Ok);
+            REQUIRE(resp != nullptr);
+
+            CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
+            CHECK(resp->contentType() == CT_APPLICATION_JSON);
+
+            auto result = json::parse(resp->getBody());
+            auto game = gameRepository.findGameById(result["game_id"]);
+            CHECK(result["history"].size() == 1);
+
+            auto expected = json{{"guess", 1234}, {"respond", "4A0B"}};
+            CHECK(expected == result["history"][0]);
+        });
+    }
 
 }
 

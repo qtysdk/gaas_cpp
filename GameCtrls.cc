@@ -12,7 +12,7 @@ void GameCtrls::asyncHandleHttpRequest(const HttpRequestPtr &req,
     Output output;
 
     auto data = json::parse(req->getBody());
-    uc.execute(Input(data["player_name"]), output);
+    uc.execute(CreateGameInput(data["player_name"]), output);
 
     auto resp = HttpResponse::newHttpResponse();
     resp->setStatusCode(k200OK);
@@ -25,12 +25,17 @@ void GameCtrls::asyncHandleHttpRequest(const HttpRequestPtr &req,
 void GuessNumberCtrl::asyncHandleHttpRequest(const HttpRequestPtr &req,
                                              std::function<void(const HttpResponsePtr &)> &&callback) {
 
-    // TODO invoke use-case here
+    GuessNumberUseCase uc;
+    Output output;
+
+
+    auto data = json::parse(req->getBody());
+    uc.execute(GuessNumberInput(data["game_id"], data["number"]), output);
 
     auto resp = HttpResponse::newHttpResponse();
     resp->setStatusCode(k200OK);
     resp->setContentTypeCode(CT_TEXT_HTML);
-    resp->setBody("{}");
+    resp->setBody(output.to_json());
     resp->setContentTypeCode(CT_APPLICATION_JSON);
     callback(resp);
 }

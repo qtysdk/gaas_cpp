@@ -12,9 +12,11 @@ private:
 public:
     ~GameRepository();
 
-    const Game &create(std::string playerName);
+    Game *create(std::string playerName);
 
-    const Game & findGameById(std::string gameId);
+    Game *findGameById(std::string gameId);
+
+    void save(Game *game);
 };
 
 extern GameRepository gameRepository;

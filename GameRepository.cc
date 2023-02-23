@@ -17,14 +17,18 @@ const std::string randomId() {
     return std::to_string(rand());
 }
 
-const Game &GameRepository::create(std::string playerName) {
+Game *GameRepository::create(std::string playerName) {
     Game *game = new Game();
     game->id = randomId();
     game->playerName = playerName;
     storage[game->id] = game;
-    return *game;
+    return game;
 }
 
-const Game &GameRepository::findGameById(std::string gameId) {
-    return *storage[gameId];
+Game *GameRepository::findGameById(std::string gameId) {
+    return storage[gameId];
+}
+
+void GameRepository::save(Game *game) {
+    // do nothing, there are all in the memory
 }

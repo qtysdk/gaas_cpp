@@ -14,7 +14,7 @@ public:
     PATH_LIST_END
 };
 
-class GuessNumberCtrl : public drogon::HttpSimpleController<GameCtrls> {
+class GuessNumberCtrl : public drogon::HttpSimpleController<GuessNumberCtrl> {
 public:
     void
     asyncHandleHttpRequest(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) override;

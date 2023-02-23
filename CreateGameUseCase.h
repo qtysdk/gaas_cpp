@@ -6,19 +6,21 @@
 
 using namespace std;
 
-class Input {
+class CreateGameInput {
 
 public:
     string playerName;
 
-    Input(string playerName);
+    CreateGameInput(string playerName);
 };
 
 class Output {
 
+private:
+    string gameStatus;
 
 public:
-    Game game;
+    void buildGameStatus(Game *game);
 
     string to_json();
 };
@@ -26,5 +28,20 @@ public:
 class CreateGameUseCase {
 
 public:
-    void execute(Input input, Output &output);
+    void execute(CreateGameInput input, Output &output);
+};
+
+
+class GuessNumberInput {
+
+public:
+    string gameId;
+    int number;
+
+    GuessNumberInput(const string &gameId, int number);
+};
+
+class GuessNumberUseCase {
+public:
+    void execute(GuessNumberInput input, Output &output);
 };

@@ -5,28 +5,41 @@
 using namespace std;
 using json = nlohmann::json;
 
-Input::Input(string playerName) {
+CreateGameInput::CreateGameInput(string playerName) {
     this->playerName = playerName;
 }
 
-void CreateGameUseCase::execute(Input input, Output &output) {
+void CreateGameUseCase::execute(CreateGameInput input, Output &output) {
     // 用 repo 查改存推
-    auto game = gameRepository.create(input.playerName);
-    output.game = game;
+    Game *game = gameRepository.create(input.playerName);
+    output.buildGameStatus(game);
 }
 
 
-string Output::to_json() {
+void Output::buildGameStatus(Game *game) {
     json history = json::array();
-    for (const auto &record: this->game.history) {
+    for (const auto &record: game->history) {
         json entry;
         entry["guess"] = record->guess;
         entry["respond"] = record->respond;
         history.push_back(entry);
     }
 
-    return json{{"game_id",     this->game.id},
-                {"player_name", this->game.playerName},
-                {"history",     history}
-    }.dump();
+    this->gameStatus = json{{"game_id",     game->id},
+                            {"player_name", game->playerName},
+                            {"history",     history}}.dump();
 }
+
+string Output::to_json() {
+    return this->gameStatus;
+}
+
+void GuessNumberUseCase::execute(GuessNumberInput input, Output &output) {
+    Game *game = gameRepository.findGameById(input.gameId);
+    game->guessNumber(input.number);
+    gameRepository.save(game);
+    output.buildGameStatus(game);
+    return;
+}
+
+GuessNumberInput::GuessNumberInput(const string &gameId, int number) : gameId(gameId), number(number) {}
