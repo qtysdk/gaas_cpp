@@ -1,5 +1,5 @@
 #include "GameCtrls.h"
-#include "CreateGameUseCase.h"
+#include "UseCases.h"
 #include <nlohmann/json.hpp>
 #include "GameRepository.h"
 
