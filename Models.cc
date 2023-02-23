@@ -29,7 +29,24 @@ int createAnswer() {
 }
 
 bool validateNumber(int number) {
-    return false;
+    if (number < 1000 || number > 9999) {
+        return false;
+    }
+    int s[10];
+    std::fill(s, s + 10, 0);
+
+    s[number / 1000]++;
+    s[number % 1000 / 100]++;
+    s[number % 100 / 10]++;
+    s[number % 10]++;
+
+    for (const auto &item: s) {
+        if (item > 1) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 std::string createRespond(int answer, int number) {
