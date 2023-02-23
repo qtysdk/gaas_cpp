@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <random>
 #include "Models.h"
 
 Game::~Game() {
@@ -25,7 +26,15 @@ bool Game::guessNumber(int number) {
 }
 
 int createAnswer() {
-    return 0;
+    int v[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::shuffle(v, v + 10, g);
+    if (v[0] == 0) {
+        return createAnswer();
+    }
+    return v[0] * 1000 + v[1] * 100 + v[2] * 10 + v[3];
 }
 
 bool validateNumber(int number) {
