@@ -20,7 +20,7 @@ private:
     string gameStatus;
 
 public:
-    void buildGameStatus(Game *game);
+    void buildGameStatus(std::shared_ptr<Game> game);
 
     string to_json();
 };

@@ -15,7 +15,7 @@ public:
     std::string id;
     std::string playerName;
     int answer;
-    std::list<Record *> history;
+    std::list<std::shared_ptr<Record>> history;
 
     Game();
 
