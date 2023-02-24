@@ -19,8 +19,13 @@ endif ()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} main.cc src/web/NothingCtrl.cc src/web/CreateGameCtrl.cc src/web/GuessNumberCtrl.cc src/usecase/GuessNumber.cc src/repo/GameRepository.cc src/model/Model.cc src/usecase/CreateGame.cc src/usecase/common.cc)
+file(GLOB web_src src/web/*.cc)
+add_executable(${PROJECT_NAME} main.cc ${web_src})
 
+add_subdirectory(src/model)
+add_subdirectory(src/repo)
+add_subdirectory(src/usecase)
+add_subdirectory(src/web)
 
 # add dependencies
 include(cmake/CPM.cmake)
@@ -34,7 +39,7 @@ CPMAddPackage("gh:nlohmann/json@3.10.5")
 #
 # and comment out the following lines
 find_package(Drogon CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon nlohmann_json::nlohmann_json usecase)
 
 # ##############################################################################
 

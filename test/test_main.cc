@@ -8,18 +8,6 @@
 using namespace drogon;
 using json = nlohmann::json;
 
-HttpResponsePtr http_get(std::string path) {
-    auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
-    auto req = HttpRequest::newHttpRequest();
-    req->setPath(path);
-    auto resp = client->sendRequest(req);
-    assert(resp.first == ReqResult::Ok);
-    assert(resp.second != nullptr);
-
-    assert(resp.second->getStatusCode() == HttpStatusCode::k200OK);
-    assert(resp.second->contentType() == CT_APPLICATION_JSON);
-    return resp.second;
-}
 
 HttpResponsePtr http_post(std::string path, std::string body) {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
@@ -34,10 +22,6 @@ HttpResponsePtr http_post(std::string path, std::string body) {
     assert(resp.second->getStatusCode() == HttpStatusCode::k200OK);
     assert(resp.second->contentType() == CT_APPLICATION_JSON);
     return resp.second;
-}
-
-DROGON_TEST(NothingAPITest) {
-    auto resp = http_get("/");
 }
 
 
