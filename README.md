@@ -10,7 +10,7 @@
 
 ### 完整實作記錄
 
-https://hackmd.io/@iD40lBm-QAqgh62DVHbjPA/HyE0Szr0i
+* 👉 [傳送門](notes/README.md) ✨✨✨
 
 ### 專案狀態
 
