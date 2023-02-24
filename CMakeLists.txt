@@ -19,7 +19,7 @@ endif ()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} main.cc NothingCtrl.cc GameCtrls.cc UseCases.cc GameRepository.cc Models.cc)
+add_executable(${PROJECT_NAME} main.cc src/web/NothingCtrl.cc src/web/CreateGameCtrl.cc src/web/GuessNumberCtrl.cc src/usecase/GuessNumber.cc src/repo/GameRepository.cc src/model/Model.cc src/usecase/CreateGame.cc src/usecase/common.cc)
 
 
 # add dependencies

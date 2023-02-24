@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(gaas_cpp_test CXX)
 
-add_executable(${PROJECT_NAME} test_main.cc ../NothingCtrl.cc ../GameCtrls.cc ../UseCases.cc ../GameRepository.cc ../Models.cc)
+add_executable(${PROJECT_NAME} test_main.cc ../src/web/NothingCtrl.cc ../src/web/CreateGameCtrl.cc ../src/web/GuessNumberCtrl.cc ../src/usecase/GuessNumber.cc ../src/repo/GameRepository.cc ../src/model/Model.cc ../src/usecase/CreateGame.cc ../src/usecase/common.cc)
 
 # add dependencies
 include(../cmake/CPM.cmake)

@@ -3,7 +3,7 @@
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
 #include <nlohmann/json.hpp>
-#include "../GameRepository.h"
+#include "../src/repo/GameRepository.h"
 
 using namespace drogon;
 using json = nlohmann::json;
