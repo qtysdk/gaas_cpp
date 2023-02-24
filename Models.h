@@ -2,6 +2,8 @@
 
 #include <string>
 #include <list>
+#include <memory>
+#include <algorithm>
 
 class Record {
 public:

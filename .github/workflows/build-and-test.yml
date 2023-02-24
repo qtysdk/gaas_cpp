@@ -1,0 +1,66 @@
+name: CMake
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libjsoncpp-* doxygen
+
+      - name: Restore Drogon
+        id: cache-drogon
+        uses: actions/cache/restore@v3
+        with:
+          key: drogon-v1.8.3-2
+          path: ${{github.workspace}}/drogon
+
+      - name: Install Drogon
+        id: install-drogon-from-source
+        if: steps.cache-drogon.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch v1.8.3 https://github.com/drogonframework/drogon
+          cd drogon
+          git submodule update --init
+          cmake -B build
+          cd build && sudo make install
+          cd ${{github.workspace}}
+
+      - name: Install Drogon From Cache
+        id: install-drogon-from-cache
+        if: steps.cache-drogon.outputs.cache-hit == 'true'
+        run: |
+          cd drogon
+          cd build && sudo make install
+          cd ${{github.workspace}}
+
+      - name: Save Drogon
+        id: cache-drogon-save
+        uses: actions/cache/save@v3
+        with:
+          key: drogon-v1.8.3-2
+          path: ${{github.workspace}}/drogon
+        if: ${{ steps.install-drogon-from-source.outcome == 'success' }}
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: |
+          ./test/gaas_cpp_test
+
