@@ -8,21 +8,36 @@
 using namespace drogon;
 using json = nlohmann::json;
 
-DROGON_TEST(NothingAPITest) {
+HttpResponsePtr http_get(std::string path) {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
     auto req = HttpRequest::newHttpRequest();
-    req->setPath("/");
-    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
-        REQUIRE(res == ReqResult::Ok);
-        REQUIRE(resp != nullptr);
+    req->setPath(path);
+    auto resp = client->sendRequest(req);
+    assert(resp.first == ReqResult::Ok);
+    assert(resp.second != nullptr);
 
-        CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
-        CHECK(resp->contentType() == CT_APPLICATION_JSON);
+    assert(resp.second->getStatusCode() == HttpStatusCode::k200OK);
+    assert(resp.second->contentType() == CT_APPLICATION_JSON);
+    return resp.second;
+}
 
-        // TODO check the response in that format
-        // {"game_id": "", "playerName": "", "history": ""}
-    });
+HttpResponsePtr http_post(std::string path, std::string body) {
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
+    auto req = HttpRequest::newHttpRequest();
+    req->setPath(path);
+    req->setMethod(HttpMethod::Post);
+    req->setBody(body);
+    auto resp = client->sendRequest(req);
+    assert(resp.first == ReqResult::Ok);
+    assert(resp.second != nullptr);
 
+    assert(resp.second->getStatusCode() == HttpStatusCode::k200OK);
+    assert(resp.second->contentType() == CT_APPLICATION_JSON);
+    return resp.second;
+}
+
+DROGON_TEST(NothingAPITest) {
+    auto resp = http_get("/");
 }
 
 
@@ -60,77 +75,39 @@ DROGON_TEST(GAME_AnswerGeneratorTest) {
 
 DROGON_TEST(GameAPITest) {
 
-    std::mutex mtx;
-    std::condition_variable cv;
-    bool finished = false;
 
     std::string gameId = "";
     {
-        auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
-        auto req = HttpRequest::newHttpRequest();
-        req->setMethod(HttpMethod::Post);
+        auto resp = http_post("/guess_number_game:start", json{{"player_name", "I have no name"}}.dump());
+        CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
+        CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
-        req->setPath("/guess_number_game:start");
-        auto createGameData = json{{"player_name", "I have no name"}};
-        req->setBody(createGameData.dump());
+        auto result = json::parse(resp->getBody());
+        auto game = gameRepository.findGameById(result["game_id"]);
 
-
-        client->sendRequest(req, [TEST_CTX, &gameId, &mtx, &finished, &cv](ReqResult res, const HttpResponsePtr &resp) {
-            REQUIRE(res == ReqResult::Ok);
-            REQUIRE(resp != nullptr);
-
-            CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
-            CHECK(resp->contentType() == CT_APPLICATION_JSON);
-
-            auto result = json::parse(resp->getBody());
-            auto game = gameRepository.findGameById(result["game_id"]);
-
-            CHECK("I have no name" == result["player_name"]);
-            CHECK("I have no name" == game->playerName);
-            CHECK(result["history"].empty());
-
-            std::unique_lock<std::mutex> lock(mtx);
-            finished = true;
-            cv.notify_all();
-            gameId = game->id;
-        });
+        CHECK("I have no name" == result["player_name"]);
+        CHECK("I have no name" == game->playerName);
+        CHECK(result["history"].empty());
+        gameId = game->id;
     }
 
-
-    // Wait for the callback to complete
-    std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [&]() { return finished; });
-
     {
-        auto client = HttpClient::newHttpClient("http://127.0.0.1:8848");
-        auto req = HttpRequest::newHttpRequest();
-        req->setMethod(HttpMethod::Post);
-
-        req->setPath("/guess_number_game:guess");
-        auto guessNumberData = json{{"game_id", gameId},
-                                    {"number",  1234}};
-
-        req->setBody(guessNumberData.dump());
-
         // arrange the final answer
         Game *game = gameRepository.findGameById(gameId);
         game->answer = 1234;
 
+        auto resp = http_post("/guess_number_game:guess",
+                              json{{"game_id", gameId},
+                                   {"number",  1234}}.dump());
 
-        client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr &resp) {
-            REQUIRE(res == ReqResult::Ok);
-            REQUIRE(resp != nullptr);
 
-            CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
-            CHECK(resp->contentType() == CT_APPLICATION_JSON);
+        auto result = json::parse(resp->getBody());
+        CHECK(result["history"].size() == 1);
 
-            auto result = json::parse(resp->getBody());
-            CHECK(result["history"].size() == 1);
+        auto expected = json{{"guess",   1234},
+                             {"respond", "4A0B"}};
+        CHECK(expected == result["history"][0]);
 
-            auto expected = json{{"guess",   1234},
-                                 {"respond", "4A0B"}};
-            CHECK(expected == result["history"][0]);
-        });
     }
 
 }
