@@ -93,7 +93,7 @@ DROGON_TEST(GameAPITest) {
 
     {
         // arrange the final answer
-        Game *game = gameRepository.findGameById(gameId);
+        std::shared_ptr<Game> game = gameRepository.findGameById(gameId);
         game->answer = 1234;
 
         auto resp = http_post("/guess_number_game:guess",

@@ -5,10 +5,7 @@
 GameRepository gameRepository;
 
 GameRepository::~GameRepository() {
-    std::cout << "Invoke ~GameRepository" << std::endl;
-    for (auto it = storage.begin(); it != storage.end(); ++it) {
-        delete it->second;
-    }
+    storage.clear();
 }
 
 
@@ -17,18 +14,18 @@ const std::string randomId() {
     return std::to_string(rand());
 }
 
-Game *GameRepository::create(std::string playerName) {
-    Game *game = new Game();
+std::shared_ptr<Game> GameRepository::create(std::string playerName) {
+    std::shared_ptr<Game> game = std::make_shared<Game>();
     game->id = randomId();
     game->playerName = playerName;
     storage[game->id] = game;
     return game;
 }
 
-Game *GameRepository::findGameById(std::string gameId) {
+std::shared_ptr<Game> GameRepository::findGameById(std::string gameId) {
     return storage[gameId];
 }
 
-void GameRepository::save(Game *game) {
+void GameRepository::save(std::shared_ptr<Game> game) {
     // do nothing, there are all in the memory
 }

@@ -5,10 +5,6 @@
 #include "Models.h"
 
 Game::~Game() {
-    std::cout << "~Game() " << this << std::endl;
-    for (auto it = history.begin(); it != history.end(); ++it) {
-        delete *it;
-    }
     history.clear();
 }
 
@@ -17,7 +13,7 @@ Game::Game() {
 }
 
 bool Game::guessNumber(int number) {
-    Record *r = new Record;
+    auto r = std::make_shared<Record>();
     r->guess = number;
     r->respond = createRespond(this->answer, number);
     history.push_back(r);

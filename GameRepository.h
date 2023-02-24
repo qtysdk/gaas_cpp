@@ -7,16 +7,16 @@
 class GameRepository {
 
 private:
-    std::map<std::string, Game *> storage;
+    std::map<std::string, std::shared_ptr<Game>> storage;
 
 public:
     ~GameRepository();
 
-    Game *create(std::string playerName);
+    std::shared_ptr<Game> create(std::string playerName);
 
-    Game *findGameById(std::string gameId);
+    std::shared_ptr<Game> findGameById(std::string gameId);
 
-    void save(Game *game);
+    void save(std::shared_ptr<Game> game);
 };
 
 extern GameRepository gameRepository;
