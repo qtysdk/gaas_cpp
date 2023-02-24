@@ -2,7 +2,7 @@
 
 #include <string>
 #include <map>
-#include "Models.h"
+#include "../model/Model.h"
 
 class GameRepository {
 
