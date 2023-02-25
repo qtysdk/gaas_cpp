@@ -1,4 +1,5 @@
 #include "GuessNumberCtrl.h"
+#include "common.h"
 
 void GuessNumberCtrl::asyncHandleHttpRequest(const drogon::HttpRequestPtr &req,
                                              function<void(const drogon::HttpResponsePtr &)> &&callback) {
@@ -9,11 +10,5 @@ void GuessNumberCtrl::asyncHandleHttpRequest(const drogon::HttpRequestPtr &req,
 
     auto data = nlohmann::json::parse(req->getBody());
     uc.execute(GuessNumberInput(data["game_id"], data["number"]), output);
-
-    auto resp = drogon::HttpResponse::newHttpResponse();
-    resp->setStatusCode(drogon::k200OK);
-    resp->setContentTypeCode(drogon::CT_TEXT_HTML);
-    resp->setBody(output.to_json());
-    resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
-    callback(resp);
+    callback(newJsonResponse(output.to_json()));
 }
