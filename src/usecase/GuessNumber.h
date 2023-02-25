@@ -2,7 +2,7 @@
 
 #include <string>
 #include <list>
-#include "../model/Model.h"
+#include "../model/Game.h"
 #include "common.h"
 
 using namespace std;
