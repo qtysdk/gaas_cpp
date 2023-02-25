@@ -9,6 +9,7 @@ Game::~Game() {
 }
 
 Game::Game() {
+    this->won = false;
     this->answer = createAnswer();
 }
 
@@ -17,6 +18,9 @@ bool Game::guessNumber(int number) {
     r->guess = number;
     r->respond = createRespond(this->answer, number);
     history.push_back(r);
+    if (r->respond == "4A0B") {
+        this->won = true;
+    }
     return false;
 }
 

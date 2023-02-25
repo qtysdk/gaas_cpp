@@ -6,12 +6,12 @@ using namespace std;
 using json = nlohmann::json;
 
 
-
-
 void GuessNumberUseCase::execute(GuessNumberInput input, Output &output) {
     std::shared_ptr<Game> game = gameRepository.findGameById(input.gameId);
-    game->guessNumber(input.number);
-    gameRepository.save(game);
+    if (!game->won) {
+        game->guessNumber(input.number);
+        gameRepository.save(game);
+    }
     output.buildGameStatus(game);
     return;
 }
