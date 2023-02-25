@@ -21,11 +21,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 file(GLOB web_src src/web/*.cc)
 add_executable(${PROJECT_NAME} main.cc ${web_src})
+add_dependencies(${PROJECT_NAME} repo)
 
 add_subdirectory(src/model)
 add_subdirectory(src/repo)
 add_subdirectory(src/usecase)
-add_subdirectory(src/web)
 
 # add dependencies
 include(cmake/CPM.cmake)
