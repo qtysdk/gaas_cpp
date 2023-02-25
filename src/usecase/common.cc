@@ -14,7 +14,9 @@ void Output::buildGameStatus(std::shared_ptr<Game> game) {
 
     this->gameStatus = json{{"game_id",     game->id},
                             {"player_name", game->playerName},
-                            {"history",     history}}.dump();
+                            {"won",         game->won},
+                            {"history",     history},
+    }.dump();
 }
 
 std::string Output::to_json() {

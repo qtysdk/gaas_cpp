@@ -17,6 +17,7 @@ public:
     std::string id;
     std::string playerName;
     int answer;
+    bool won;
     std::list<std::shared_ptr<Record>> history;
 
     Game();

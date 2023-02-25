@@ -1,9 +1,8 @@
 #include "CreateGameCtrl.h"
 #include "../usecase/GuessNumber.h"
 #include "nlohmann/json.hpp"
-#include "../repo/GameRepository.h"
-#include "GuessNumberCtrl.h"
 #include "../usecase/CreateGame.h"
+
 
 using json = nlohmann::json;
 

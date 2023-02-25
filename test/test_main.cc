@@ -72,6 +72,7 @@ DROGON_TEST(GameAPITest) {
         CHECK("I have no name" == result["player_name"]);
         CHECK("I have no name" == game->playerName);
         CHECK(result["history"].empty());
+        CHECK(result["won"] == false);
         gameId = game->id;
     }
 
@@ -91,7 +92,7 @@ DROGON_TEST(GameAPITest) {
         auto expected = json{{"guess",   1234},
                              {"respond", "4A0B"}};
         CHECK(expected == result["history"][0]);
-
+        CHECK(result["won"] == true);
     }
 
 }
