@@ -2,7 +2,7 @@
 
 #include <string>
 #include <memory>
-#include "../model/Model.h"
+#include "../model/Game.h"
 
 class Output {
 

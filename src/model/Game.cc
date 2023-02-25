@@ -2,7 +2,7 @@
 #include <iostream>
 #include <random>
 #include <sstream>
-#include "Model.h"
+#include "Game.h"
 
 Game::~Game() {
     history.clear();
