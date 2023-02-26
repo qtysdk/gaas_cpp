@@ -7,3 +7,4 @@
 * 整理成「會尖叫的架構」就是看目錄跟檔案上的名稱，就能略知一二這些為什麼而設計的 https://github.com/qtysdk/gaas_cpp/pull/3
 * 製作簡單的 Console App 展示 CA 架構下，只要換掉最外層的內核是可以重用的 https://github.com/qtysdk/gaas_cpp/pull/8
 * 替換多餘的 Json Library，直接使用 Drogon Framework 相依的 jsoncpp https://github.com/qtysdk/gaas_cpp/pull/9
+* 採用 google-test 進行測試，更方便 IDE 整合 https://github.com/qtysdk/gaas_cpp/pull/11
