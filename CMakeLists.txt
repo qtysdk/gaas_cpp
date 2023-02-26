@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(gaas_cpp CXX)
-
+set(CMAKE_FIND_PACKAGE_DEBUG ON)
 include(CheckIncludeFileCXX)
 
 check_include_file_cxx(any HAS_ANY)

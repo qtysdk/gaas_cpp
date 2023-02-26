@@ -3,6 +3,7 @@
 #include <drogon/HttpAppFramework.h>
 #include "../src/model/Game.h"
 #include "../src/repo/GameRepository.h"
+#include "test_container.h"
 
 
 using namespace drogon;
@@ -86,6 +87,15 @@ Json::Value parsed_output(std::string_view response) {
     return v;
 }
 
+
+TEST(TOOL, TestContainer) {
+    for (int i = 0; i < 3; i++) {
+        TestContainer c;
+        std::cout << c.getClient() << std::endl;
+    }
+}
+
+
 TEST(ATDD, GameAPITest) {
 
 
@@ -145,7 +155,7 @@ int main(int argc, char **argv) {
     int status = RUN_ALL_TESTS();
 
     // Ask the event loop to shutdown and wait
-    app().getLoop()->queueInLoop([&status]() {
+    app().getLoop()->queueInLoop([]() {
         app().quit();
     });
     thr.join();
