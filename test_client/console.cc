@@ -1,7 +1,6 @@
 #include <iostream>
 #include "../src/usecase/CreateGame.h"
 #include "../src/usecase/GuessNumber.h"
-#include <nlohmann/json.hpp>
 
 
 void game_loop();
@@ -61,7 +60,7 @@ void showGuessRespond(Output &output, const string &gameId, const pair<bool, int
     return;
 }
 
-bool isGameFinished(const Output &output) { return output.gameStatus["won"]; }
+bool isGameFinished(const Output &output) { return output.gameStatus["won"].asBool(); }
 
 std::string startGame(Output &output) {
     string playerName = "";
@@ -73,7 +72,7 @@ std::string startGame(Output &output) {
     createGameUseCase.execute(CreateGameInput(playerName), output);
     cout << "Hi, " << output.gameStatus["player_name"] << endl;
 
-    return output.gameStatus["game_id"];
+    return output.gameStatus["game_id"].asString();
 }
 
 bool isInteger(const std::string &str) {

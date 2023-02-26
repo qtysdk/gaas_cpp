@@ -3,14 +3,13 @@
 #include <string>
 #include <memory>
 #include "../model/Game.h"
-#include <nlohmann/json.hpp>
+#include <json/json.h>
 
-using json = nlohmann::json;
 
 class Output {
 
 public:
-    json gameStatus;
+    Json::Value gameStatus;
 
 public:
     void buildGameStatus(std::shared_ptr<Game> game);

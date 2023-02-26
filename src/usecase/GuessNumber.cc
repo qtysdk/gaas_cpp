@@ -1,9 +1,8 @@
 #include "GuessNumber.h"
-#include "nlohmann/json.hpp"
+#include <json/json.h>
 #include "../repo/GameRepository.h"
 
 using namespace std;
-using json = nlohmann::json;
 
 
 void GuessNumberUseCase::execute(GuessNumberInput input, Output &output) {
