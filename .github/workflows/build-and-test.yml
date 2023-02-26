@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libjsoncpp-* doxygen
+        run: sudo apt-get update && sudo apt-get install -y libjsoncpp-* doxygen libgtest-dev
 
       - name: Restore Drogon
         id: cache-drogon
@@ -63,4 +63,5 @@ jobs:
         working-directory: ${{github.workspace}}/build
         run: |
           ./test/gaas_cpp_test
+          ./test_gtest/gaas_cpp_gtest
 
