@@ -19,6 +19,8 @@ endif ()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules/)
+
 file(GLOB web_src src/web/*.cc)
 add_executable(${PROJECT_NAME} main.cc ${web_src})
 add_dependencies(${PROJECT_NAME} repo)
@@ -28,8 +30,9 @@ add_subdirectory(src/repo)
 add_subdirectory(src/usecase)
 
 # add dependencies
-include(cmake/CPM.cmake)
-CPMAddPackage("gh:nlohmann/json@3.10.5")
+find_package(Jsoncpp REQUIRED)
+include_directories(${JSONCPP_INCLUDE_DIRS})
+
 
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
@@ -39,7 +42,7 @@ CPMAddPackage("gh:nlohmann/json@3.10.5")
 #
 # and comment out the following lines
 find_package(Drogon CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon nlohmann_json::nlohmann_json usecase)
+target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon Jsoncpp_lib usecase)
 
 # ##############################################################################
 

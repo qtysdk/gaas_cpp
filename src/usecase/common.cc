@@ -1,25 +1,26 @@
 #include "common.h"
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
+#include <json/json.h>
 
 void Output::buildGameStatus(std::shared_ptr<Game> game) {
-    json history = json::array();
+    Json::Value history(Json::arrayValue);
     for (const auto &record: game->history) {
-        json entry;
+        Json::Value entry;
         entry["guess"] = record->guess;
         entry["respond"] = record->respond;
-        history.push_back(entry);
+        history.append(entry);
     }
 
-    this->gameStatus = json{{"game_id",     game->id},
-                            {"player_name", game->playerName},
-                            {"won",         game->won},
-                            {"history",     history},
-    };
+    Json::Value status;
+    status["game_id"] = game->id;
+    status["player_name"] = game->playerName;
+    status["won"] = game->won;
+    status["history"] = history;
 
+    this->gameStatus = status;
 }
 
 std::string Output::to_json() {
-    return this->gameStatus.dump();
+    Json::FastWriter writer;
+    std::string json_str = writer.write(this->gameStatus);
+    return json_str;
 }

@@ -2,7 +2,6 @@
 
 #include <drogon/HttpSimpleController.h>
 #include "../repo/GameRepository.h"
-#include "nlohmann/json.hpp"
 #include "../usecase/GuessNumber.h"
 
 class GuessNumberCtrl : public drogon::HttpSimpleController<GuessNumberCtrl> {

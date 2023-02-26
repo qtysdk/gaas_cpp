@@ -2,11 +2,9 @@
 
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
-#include <nlohmann/json.hpp>
 #include "../src/repo/GameRepository.h"
 
 using namespace drogon;
-using json = nlohmann::json;
 
 
 HttpResponsePtr http_post(std::string path, std::string body) {
@@ -57,19 +55,48 @@ DROGON_TEST(GAME_AnswerGeneratorTest) {
 
 }
 
+std::string create_game_input(std::string playerName) {
+    Json::Value requestData;
+    Json::FastWriter writer;
+    requestData["player_name"] = playerName;
+    return writer.write(requestData);
+}
+
+std::string create_guess_input(std::string gameId, int number) {
+    Json::Value requestData;
+    Json::FastWriter writer;
+    requestData["game_id"] = gameId;
+    requestData["number"] = number;
+    return writer.write(requestData);
+}
+
+Json::Value create_respond_entry(std::string respond, int number) {
+    Json::Value requestData;
+    requestData["respond"] = respond;
+    requestData["guess"] = number;
+    return requestData;
+}
+
+Json::Value parsed_output(std::string_view response) {
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(std::string(response), v);
+    return v;
+}
+
 DROGON_TEST(GameAPITest) {
 
 
     std::string gameId = "";
     {
-        auto resp = http_post("/guess_number_game:start", json{{"player_name", "I have no name"}}.dump());
+        auto resp = http_post("/guess_number_game:start", create_game_input("I have no name"));
         CHECK(resp->getStatusCode() == HttpStatusCode::k200OK);
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
-        auto result = json::parse(resp->getBody());
-        auto game = gameRepository.findGameById(result["game_id"]);
+        Json::Value result = parsed_output(resp->getBody());
+        auto game = gameRepository.findGameById(result["game_id"].asString());
 
-        CHECK("I have no name" == result["player_name"]);
+        CHECK("I have no name" == result["player_name"].asString());
         CHECK("I have no name" == game->playerName);
         CHECK(result["history"].empty());
         CHECK(result["won"] == false);
@@ -81,17 +108,13 @@ DROGON_TEST(GameAPITest) {
         std::shared_ptr<Game> game = gameRepository.findGameById(gameId);
         game->answer = 1234;
 
-        auto resp = http_post("/guess_number_game:guess",
-                              json{{"game_id", gameId},
-                                   {"number",  1234}}.dump());
+        auto resp = http_post("/guess_number_game:guess", create_guess_input(gameId, 1234));
 
 
-        auto result = json::parse(resp->getBody());
+        auto result = parsed_output(resp->getBody());
         CHECK(result["history"].size() == 1);
 
-        auto expected = json{{"guess",   1234},
-                             {"respond", "4A0B"}};
-        CHECK(expected == result["history"][0]);
+        CHECK(create_respond_entry("4A0B", 1234) == result["history"][0]);
         CHECK(result["won"] == true);
     }
 

@@ -7,8 +7,13 @@ void GuessNumberCtrl::asyncHandleHttpRequest(const drogon::HttpRequestPtr &req,
     GuessNumberUseCase uc;
     Output output;
 
+    Json::Value data;
+    Json::Reader reader;
+    bool parsed = reader.parse(std::string(req->getBody()), data);
+    if (!parsed) {
+        // TODO handle parsing error
+    }
 
-    auto data = nlohmann::json::parse(req->getBody());
-    uc.execute(GuessNumberInput(data["game_id"], data["number"]), output);
+    uc.execute(GuessNumberInput(data["game_id"].asString(), data["number"].asInt()), output);
     callback(newJsonResponse(output.to_json()));
 }
