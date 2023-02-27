@@ -1,10 +1,15 @@
 #include "test_container.h"
 #include <Python.h>
 #include <string>
+#include <thread>
+#include <iostream>
+
 
 PyObject *createMyContainer() {
     const char *pythonScript = R"(
 from testcontainers.mongodb import MongoDbContainer
+from testcontainers.core.waiting_utils import wait_for_logs
+
 
 class MyContainer:
 
@@ -21,7 +26,9 @@ class MyContainer:
 
         import re
         port = re.findall(r'localhost:(\d+)', str(self.client))
-        self.host = f"mongodb://localhost:{port[0]}"
+        self.host = f"mongodb://test:test@127.0.0.1:{port[0]}"
+        # does this work?
+        wait_for_logs(self.mongo, "Waiting for connections")
 
     def stop(self):
         self.mongo.stop()
@@ -52,6 +59,18 @@ TestContainer::TestContainer() {
 }
 
 std::string TestContainer::getClient() {
+
+    // TODO is a better way to check the service available?
+
+    char *isRunningCI = std::getenv("CI");
+    if (isRunningCI) {
+        std::chrono::seconds sleep_duration(10);
+        std::this_thread::sleep_for(sleep_duration);
+    } else {
+        std::chrono::seconds sleep_duration(5);
+        std::this_thread::sleep_for(sleep_duration);
+    }
+
     PyObject * pResult = PyObject_GetAttrString(pMyContainerInstance, "host");
     const char *host = PyUnicode_AsUTF8(pResult);
     std::string result = host ? host : "";
@@ -61,7 +80,9 @@ std::string TestContainer::getClient() {
 
 void TestContainer::stopContainer() const { PyObject_CallObject(pStopMethod, NULL); }
 
-void TestContainer::startContainer() const { PyObject_CallObject(this->pStartMethod, NULL); }
+void TestContainer::startContainer() const {
+    PyObject_CallObject(this->pStartMethod, NULL);
+}
 
 TestContainer::~TestContainer() {
     stopContainer();

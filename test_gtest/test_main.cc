@@ -4,6 +4,7 @@
 #include "../src/model/Game.h"
 #include "../src/repo/GameRepository.h"
 #include "test_container.h"
+#include <cstdlib>
 
 
 using namespace drogon;
@@ -88,11 +89,36 @@ Json::Value parsed_output(std::string_view response) {
 }
 
 
-TEST(TOOL, TestContainer) {
-    for (int i = 0; i < 3; i++) {
-        TestContainer c;
-        std::cout << c.getClient() << std::endl;
-    }
+//TEST(TOOL, TestContainer) {
+//    for (int i = 0; i < 3; i++) {
+//        TestContainer c;
+//        std::cout << c.getClient() << std::endl;
+//    }
+//}
+
+TEST(TOOL, MongoDBRepo) {
+    TestContainer c;
+    setenv("GAAS_MONGODB_URI", c.getClient().c_str(), 1);
+    auto repo = std::make_shared<MongoDBGameRepository>();
+
+    auto createdGame = repo->create("9527");
+    ASSERT_FALSE(createdGame == nullptr);
+
+    auto foundGame = repo->findGameById(createdGame->id);
+    ASSERT_FALSE(foundGame == nullptr);
+    ASSERT_EQ(createdGame->id, foundGame->id);
+    ASSERT_EQ("9527", foundGame->playerName);
+
+    foundGame->playerName = "56不能亡";
+    foundGame->guessNumber(1234);
+    repo->save(foundGame);
+
+    auto foundGameAgain = repo->findGameById(createdGame->id);
+    ASSERT_FALSE(foundGameAgain == nullptr);
+    ASSERT_EQ(foundGameAgain->id, foundGame->id);
+    ASSERT_EQ("56不能亡", foundGameAgain->playerName);
+    ASSERT_EQ(1, foundGameAgain->history.size());
+    ASSERT_EQ(createRespond(createdGame->answer, 1234), (*foundGameAgain->history.begin())->respond);
 }
 
 
@@ -107,7 +133,7 @@ TEST(ATDD, GameAPITest) {
         ASSERT_EQ(resp->contentType(), CT_APPLICATION_JSON);
 
         Json::Value result = parsed_output(resp->getBody());
-        auto game = gameRepository.findGameById(result["game_id"].asString());
+        auto game = getGameRepo()->findGameById(result["game_id"].asString());
 
         ASSERT_EQ("I have no name", result["player_name"].asString());
         ASSERT_EQ("I have no name", game->playerName);
@@ -118,7 +144,7 @@ TEST(ATDD, GameAPITest) {
 
     {
         // arrange the final answer
-        std::shared_ptr<Game> game = gameRepository.findGameById(gameId);
+        std::shared_ptr<Game> game = getGameRepo()->findGameById(gameId);
         game->answer = 1234;
 
         auto resp = http_post("/guess_number_game:guess", create_guess_input(gameId, 1234));

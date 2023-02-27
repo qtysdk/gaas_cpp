@@ -21,3 +21,10 @@ include_directories(${JSONCPP_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon Jsoncpp_lib usecase)
 
 ParseAndAddDrogonTests(${PROJECT_NAME})
+
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
+include_directories(${LIBMONGOCXX_INCLUDE_DIR})
+include_directories(${LIBBSONCXX_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE mongo::bsoncxx_shared)
+target_link_libraries(${PROJECT_NAME} PRIVATE mongo::mongocxx_shared)

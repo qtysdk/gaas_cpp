@@ -13,6 +13,7 @@ Game::Game() {
     this->answer = createAnswer();
 }
 
+
 bool Game::guessNumber(int number) {
     auto r = std::make_shared<Record>();
     if (!validateNumber(number)) {

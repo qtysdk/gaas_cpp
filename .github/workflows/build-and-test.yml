@@ -12,14 +12,22 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    needs: build-mongocxx
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y libjsoncpp-* doxygen libgtest-dev
+          sudo apt-get update && sudo apt-get install -y curl libjsoncpp-* doxygen libgtest-dev libmongoc-dev libbson-dev
           sudo pip install testcontainers-mongodb
+
+      - name: Restore mongocxx from cache
+        id: cache-mongocxx
+        uses: actions/cache/restore@v3
+        with:
+          key: mongo-cxx-driver-4
+          path: ${{github.workspace}}/mongo-cxx
 
       - name: Restore Drogon
         id: cache-drogon
@@ -56,7 +64,12 @@ jobs:
         if: ${{ steps.install-drogon-from-source.outcome == 'success' }}
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: |
+          echo "-"
+          find ${{github.workspace}}/mongo-cxx
+          echo "-"
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/mongo-cxx/lib/cmake 
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -67,3 +80,38 @@ jobs:
           ./test/gaas_cpp_test
           ./test_gtest/gaas_cpp_gtest
 
+  build-mongocxx:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl libjsoncpp-* doxygen libgtest-dev libmongoc-dev libbson-dev
+
+      - name: Restore from cache
+        id: cache-mongocxx
+        uses: actions/cache/restore@v3
+        with:
+          key: mongo-cxx-driver-4
+          path: ${{github.workspace}}/mongo-cxx
+
+      - name: Build MongoCXX
+        id: install-mongocxx-from-source
+        if: steps.cache-mongocxx.outputs.cache-hit != 'true'
+        run: |
+          curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.7.0/mongo-cxx-driver-r3.7.0.tar.gz
+          tar zxf mongo-cxx-driver-r3.7.0.tar.gz
+          cd mongo-cxx-driver-r3.7.0/build
+          sudo cmake -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/mongo-cxx -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 ..
+          sudo make -j4 install
+          pwd
+
+      - name: Save Build
+        id: cache-mongocxx-save
+        uses: actions/cache/save@v3
+        with:
+          key: mongo-cxx-driver-4
+          path: ${{github.workspace}}/mongo-cxx
+        if: ${{ steps.install-mongocxx-from-source.outcome == 'success' }}
