@@ -94,7 +94,7 @@ DROGON_TEST(GameAPITest) {
         CHECK(resp->contentType() == CT_APPLICATION_JSON);
 
         Json::Value result = parsed_output(resp->getBody());
-        auto game = gameRepository.findGameById(result["game_id"].asString());
+        auto game = getGameRepo()->findGameById(result["game_id"].asString());
 
         CHECK("I have no name" == result["player_name"].asString());
         CHECK("I have no name" == game->playerName);
@@ -105,7 +105,7 @@ DROGON_TEST(GameAPITest) {
 
     {
         // arrange the final answer
-        std::shared_ptr<Game> game = gameRepository.findGameById(gameId);
+        std::shared_ptr<Game> game = getGameRepo()->findGameById(gameId);
         game->answer = 1234;
 
         auto resp = http_post("/guess_number_game:guess", create_guess_input(gameId, 1234));

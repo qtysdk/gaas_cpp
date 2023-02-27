@@ -6,10 +6,10 @@ using namespace std;
 
 
 void GuessNumberUseCase::execute(GuessNumberInput input, Output &output) {
-    std::shared_ptr<Game> game = gameRepository.findGameById(input.gameId);
+    std::shared_ptr<Game> game = getGameRepo()->findGameById(input.gameId);
     if (!game->won) {
         game->guessNumber(input.number);
-        gameRepository.save(game);
+        getGameRepo()->save(game);
     }
     output.buildGameStatus(game);
     return;

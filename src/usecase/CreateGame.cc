@@ -9,7 +9,7 @@ CreateGameInput::CreateGameInput(std::string playerName) {
 
 void CreateGameUseCase::execute(CreateGameInput input, Output &output) {
     // 用 repo 查改存推
-    auto game = gameRepository.create(input.playerName);
+    auto game = getGameRepo()->create(input.playerName);
     std::cout << "create game for id: " << game->id << ", answer: " << game->answer << std::endl;
     output.buildGameStatus(game);
 }
