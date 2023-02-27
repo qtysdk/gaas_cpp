@@ -10,3 +10,4 @@
 * 替換多餘的 Json Library，直接使用 Drogon Framework 相依的 jsoncpp https://github.com/qtysdk/gaas_cpp/pull/9
 * 採用 google-test 進行測試，更方便 IDE 整合 https://github.com/qtysdk/gaas_cpp/pull/11
 * 利用 Python Runtime 帶起 MongoDB 的 test-container https://github.com/qtysdk/gaas_cpp/pull/12
+* 提供 MongoDB 版本的 GameRepository (雖然沒實裝，但測試案例驗證了可行性) https://github.com/qtysdk/gaas_cpp/pull/14
