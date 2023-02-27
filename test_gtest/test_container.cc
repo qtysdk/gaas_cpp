@@ -7,15 +7,21 @@ PyObject *createMyContainer() {
 from testcontainers.mongodb import MongoDbContainer
 
 class MyContainer:
-    def __init__(self):
-        self.mongo = MongoDbContainer('mongo:latest')
+
+    def __init__(self) -> None:
+        self.mongo = MongoDbContainer("mongo:latest")
+        self.client = None
         self.db = None
-        self.host = None
+        self.host: str = None
 
     def start(self):
         self.mongo.start()
+        self.client = self.mongo.get_connection_client()
         self.db = self.mongo.get_connection_client().test
-        self.host = self.db.command('whatsmyuri').get('you')
+
+        import re
+        port = re.findall(r'localhost:(\d+)', str(self.client))
+        self.host = f"mongodb://localhost:{port[0]}"
 
     def stop(self):
         self.mongo.stop()
