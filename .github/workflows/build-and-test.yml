@@ -17,7 +17,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libjsoncpp-* doxygen libgtest-dev
+        run: |
+          sudo apt-get update && sudo apt-get install -y libjsoncpp-* doxygen libgtest-dev
+          sudo pip install testcontainers-mongodb
 
       - name: Restore Drogon
         id: cache-drogon
