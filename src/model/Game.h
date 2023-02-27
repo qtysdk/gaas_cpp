@@ -25,6 +25,13 @@ public:
     ~Game();
 
     bool guessNumber(int number);
+
+    bool operator==(const Game &other) const {
+        return id == other.id
+               && playerName == other.playerName
+               && answer == other.answer
+               && won == other.won;
+    }
 };
 
 

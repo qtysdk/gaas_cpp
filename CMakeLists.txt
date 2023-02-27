@@ -33,7 +33,6 @@ add_subdirectory(src/usecase)
 find_package(Jsoncpp REQUIRED)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
-
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
 # to add drogon 
@@ -91,3 +90,10 @@ target_sources(${PROJECT_NAME}
 add_subdirectory(test)
 add_subdirectory(test_client)
 add_subdirectory(test_gtest)
+
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
+include_directories(${LIBMONGOCXX_INCLUDE_DIR})
+include_directories(${LIBBSONCXX_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE mongo::bsoncxx_shared)
+target_link_libraries(${PROJECT_NAME} PRIVATE mongo::mongocxx_shared)
